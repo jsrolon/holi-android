@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,6 +17,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class HoliLocator extends Activity implements
@@ -44,12 +48,16 @@ public class HoliLocator extends Activity implements
      */
     private boolean mIsInResolution;
 
-
-    private double currentLatitude;
+       private double currentLatitude;
     private double currentLongitude;
     private double currentAltitude;
     private double currentSpeed;
 
+
+    private TextView textLatitudeText;
+    private TextView textLongitudeText;
+    private TextView textSpeedText;
+    private TextView textAltitudeText;
 
     /**
      * Called when the activity is starting. Restores the activity state.
@@ -57,14 +65,22 @@ public class HoliLocator extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         if (savedInstanceState != null) {
             mIsInResolution = savedInstanceState.getBoolean(KEY_IN_RESOLUTION, false);
         }
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setInterval(3 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1000); // 1 second, in milliseconds
+
+
+
+        textLatitudeText = (TextView) findViewById(R.id.LatitudeText);
+        textLongitudeText = (TextView) findViewById(R.id.LongitudeText);
+        textAltitudeText = (TextView) findViewById(R.id.AltitudeText);
+        textSpeedText = (TextView) findViewById(R.id.SpeedText);
     }
 
     /**
@@ -136,16 +152,33 @@ public class HoliLocator extends Activity implements
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "GoogleApiClient connected");
         // TODO: Start making API requests.
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
-        currentAltitude = location.getAltitude();
-        currentSpeed = location.getSpeed();
 
-        Toast.makeText(getApplicationContext(), "Latitude: "+currentLatitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Longitude: "+currentLongitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Altitude: "+currentAltitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Speed: "+currentSpeed, Toast.LENGTH_LONG).show();
+        class SayHello extends TimerTask {
+            public void run() {
+                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                //Toast.makeText(getApplicationContext(), "Latitude: "+location.toString(), Toast.LENGTH_LONG).show();
+
+                try {
+                    currentLatitude = location.getLatitude();
+                    currentLongitude = location.getLongitude();
+                    currentAltitude = location.getAltitude();
+                    currentSpeed = location.getSpeed();
+
+
+                    textLatitudeText.setText("Latitude: " + currentLatitude);
+                    textLongitudeText.setText("Longitude: " + currentLongitude);
+                    textAltitudeText.setText("Altitude: " + currentAltitude);
+                    textSpeedText.setText("Speed: " + currentSpeed);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        Timer timer = new Timer();
+        timer.schedule(new SayHello(), 1000, 5000);
+
+
 
     }
 
@@ -214,16 +247,22 @@ public class HoliLocator extends Activity implements
     }
 
     private void handleNewLocation(Location location) {
-        Log.d(TAG, location.toString());
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
-        currentAltitude = location.getAltitude();
-        currentSpeed = location.getSpeed();
+        Toast.makeText(getApplicationContext(), "Latitude: "+location.toString(), Toast.LENGTH_LONG).show();
 
-        Toast.makeText(getApplicationContext(), "Latitude: "+currentLatitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Longitude: "+currentLongitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Altitude: "+currentAltitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), "Speed: "+currentSpeed, Toast.LENGTH_LONG).show();
+        try {
+            currentLatitude = location.getLatitude();
+            currentLongitude = location.getLongitude();
+            currentAltitude = location.getAltitude();
+            currentSpeed = location.getSpeed();
+
+
+            textLatitudeText.setText("Latitude: " + currentLatitude);
+            textLongitudeText.setText("Longitude: " + currentLongitude);
+            textAltitudeText.setText("Altitude: " + currentAltitude);
+            textSpeedText.setText("Speed: " + currentSpeed);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

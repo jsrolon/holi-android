@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/buttonEnviarTCP"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="ENVIAR POR TCP" />
+
+    <Button
+        android:id="@+id/buttonEnviarUDP"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="ENVIAR POR UDP" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id ="@+id/AltitudeText"/>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id ="@+id/LatitudeText"/>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id ="@+id/LongitudeText"/>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id ="@+id/SpeedText"/>
+
+</LinearLayout>
