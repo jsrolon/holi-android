@@ -2,35 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
-    <Button
-        android:id="@+id/buttonEnviarTCP"
+    <ToggleButton
+        android:id="@+id/togglebuttonEnviarTCP"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="ENVIAR POR TCP" />
+        android:textOn="TCP ON"
+        android:textOff="TCP OFF"/>
 
-    <Button
-        android:id="@+id/buttonEnviarUDP"
+
+    <ToggleButton
+        android:id="@+id/togglebuttonEnviarUDP"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="ENVIAR POR UDP" />
+        android:textOn="UDP ON"
+        android:textOff="UDP OFF"/>
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id ="@+id/AltitudeText"/>
+        android:id ="@+id/AltitudeText"
+        android:textColor="@color/lightgreen"/>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id ="@+id/LatitudeText"/>
+        android:id ="@+id/LatitudeText"
+        android:textColor="@color/lightgreen"/>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id ="@+id/LongitudeText"/>
+        android:id ="@+id/LongitudeText"
+        android:textColor="@color/lightgreen"/>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id ="@+id/SpeedText"/>
-
+        android:id ="@+id/SpeedText"
+        android:textColor="@color/lightgreen"/>
 </LinearLayout>
+

@@ -7,10 +7,16 @@ import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -18,6 +24,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,7 +42,7 @@ import java.util.TimerTask;
 public class HoliLocator extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+        LocationListener {
 
     private static final String TAG = "HoliLocator";
 
@@ -48,7 +65,7 @@ public class HoliLocator extends Activity implements
      */
     private boolean mIsInResolution;
 
-       private double currentLatitude;
+    private double currentLatitude;
     private double currentLongitude;
     private double currentAltitude;
     private double currentSpeed;
@@ -58,6 +75,7 @@ public class HoliLocator extends Activity implements
     private TextView textLongitudeText;
     private TextView textSpeedText;
     private TextView textAltitudeText;
+
 
     /**
      * Called when the activity is starting. Restores the activity state.
@@ -76,11 +94,85 @@ public class HoliLocator extends Activity implements
                 .setFastestInterval(1000); // 1 second, in milliseconds
 
 
-
         textLatitudeText = (TextView) findViewById(R.id.LatitudeText);
         textLongitudeText = (TextView) findViewById(R.id.LongitudeText);
         textAltitudeText = (TextView) findViewById(R.id.AltitudeText);
         textSpeedText = (TextView) findViewById(R.id.SpeedText);
+
+        ToggleButton toggleTCP = (ToggleButton) findViewById(R.id.togglebuttonEnviarTCP);
+        toggleTCP.setText("TCP");
+        toggleTCP.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    final Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            try {
+                                currentLatitude = location.getLatitude();
+                                currentLongitude = location.getLongitude();
+                                currentAltitude = location.getAltitude();
+                                currentSpeed = location.getSpeed();
+
+                                //textLatitudeText.setText("Latitude: "+currentLatitude);
+                                //textLongitudeText.setText("Longitude: "+currentLongitude);
+                                //textAltitudeText.setText("Altitude: "+currentAltitude);
+                                //textSpeedText.setText("Speed: "+currentSpeed);
+
+
+                                Log.w("holi", currentLongitude + ""  + currentLatitude);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            handler.postDelayed(this, 1000);
+                        }
+                    }, 1000);
+                } else {
+                    // The toggle is disabled
+
+                }
+            }
+        });
+
+        ToggleButton toggleUDP = (ToggleButton) findViewById(R.id.togglebuttonEnviarUDP);
+        toggleUDP.setText("UDP");
+        toggleUDP.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            try {
+                                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                                currentLatitude = location.getLatitude();
+                                currentLongitude = location.getLongitude();
+                                currentAltitude = location.getAltitude();
+                                currentSpeed = location.getSpeed();
+
+                                textLatitudeText.setText("Latitude: "+currentLatitude);
+                                textLongitudeText.setText("Longitude: "+currentLongitude);
+                                textAltitudeText.setText("Altitude: "+currentAltitude);
+                                textSpeedText.setText("Speed: "+currentSpeed);
+
+                                Log.w("holi", currentLongitude + " " + currentLatitude);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            handler.postDelayed(this, 1000);
+                        }
+                    }, 1000);
+                } else {
+                    // The toggle is disabled
+
+                }
+            }
+        });
+
+
+
+
     }
 
     /**
@@ -152,34 +244,6 @@ public class HoliLocator extends Activity implements
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "GoogleApiClient connected");
         // TODO: Start making API requests.
-
-        class SayHello extends TimerTask {
-            public void run() {
-                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                //Toast.makeText(getApplicationContext(), "Latitude: "+location.toString(), Toast.LENGTH_LONG).show();
-
-                try {
-                    currentLatitude = location.getLatitude();
-                    currentLongitude = location.getLongitude();
-                    currentAltitude = location.getAltitude();
-                    currentSpeed = location.getSpeed();
-
-
-                    textLatitudeText.setText("Latitude: " + currentLatitude);
-                    textLongitudeText.setText("Longitude: " + currentLongitude);
-                    textAltitudeText.setText("Altitude: " + currentAltitude);
-                    textSpeedText.setText("Speed: " + currentSpeed);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        Timer timer = new Timer();
-        timer.schedule(new SayHello(), 1000, 5000);
-
-
-
     }
 
 
@@ -247,22 +311,70 @@ public class HoliLocator extends Activity implements
     }
 
     private void handleNewLocation(Location location) {
-        Toast.makeText(getApplicationContext(), "Latitude: "+location.toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Latitude: " + location.toString(), Toast.LENGTH_LONG).show();
+    }
 
-        try {
-            currentLatitude = location.getLatitude();
-            currentLongitude = location.getLongitude();
-            currentAltitude = location.getAltitude();
-            currentSpeed = location.getSpeed();
+    private class SendUDPTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... param) {
+            String udpMsg = "hello world from UDP client " + 1337;
+            DatagramSocket ds = null;
+            Log.w("holi", "entra");
+            try {
 
-
-            textLatitudeText.setText("Latitude: " + currentLatitude);
-            textLongitudeText.setText("Longitude: " + currentLongitude);
-            textAltitudeText.setText("Altitude: " + currentAltitude);
-            textSpeedText.setText("Speed: " + currentSpeed);
-        } catch (Exception e) {
-            e.printStackTrace();
+                ds = new DatagramSocket();
+                InetAddress serverAddr = InetAddress.getByName("192.168.0.12");
+                DatagramPacket dp;
+                dp = new DatagramPacket(udpMsg.getBytes(), udpMsg.length(), serverAddr, 1337);
+                ds.send(dp);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (ds != null) {
+                    ds.close();
+                }
+            }
+            return null;
         }
+    }
 
+    private class SendTCPTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... param) {
+            try {
+                Socket s = new Socket("192.168.0.12", 1337);
+                BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+                //send output msg
+                String outMsg = "TCP connecting to " + 1337 + System.getProperty("line.separator");
+                out.write(outMsg);
+                out.flush();
+                Log.i("TcpClient", "sent: " + outMsg);
+                //accept server response
+                //String inMsg = in.readLine() + System.getProperty("line.separator");
+                //Log.i("TcpClient", "received: " + inMsg);
+                //close connection
+                s.close();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    private void runUdpClient() {
+        new SendUDPTask().execute();
+    }
+
+    private void runTcpClient() {
+        new SendTCPTask().execute();
     }
 }
