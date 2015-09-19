@@ -5,40 +5,93 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <ToggleButton
-        android:id="@+id/togglebuttonEnviarTCP"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textOn="TCP ON"
-        android:textOff="TCP OFF"/>
-
-
-    <ToggleButton
-        android:id="@+id/togglebuttonEnviarUDP"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textOn="UDP ON"
-        android:textOff="UDP OFF"/>
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="HOLI Protocol Client"
+        android:id="@+id/textView3"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Location Info"
+        android:id="@+id/textView4" />
+
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id ="@+id/AltitudeText"
-        android:textColor="@color/lightgreen"/>
+        android:textColor="@color/lightgreen"
+        android:text="Altitude: " />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id ="@+id/LatitudeText"
-        android:textColor="@color/lightgreen"/>
+        android:textColor="@color/lightgreen"
+        android:text="Latitude: " />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id ="@+id/LongitudeText"
-        android:textColor="@color/lightgreen"/>
+        android:textColor="@color/lightgreen"
+        android:text="Longitude: " />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id ="@+id/SpeedText"
-        android:textColor="@color/lightgreen"/>
+        android:textColor="@color/lightgreen"
+        android:text="Speed: " />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Protocol"
+            android:id="@+id/textView2" />
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="UDP"
+            android:id="@+id/radioUDP"
+            android:checked="false"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TCP"
+            android:id="@+id/radioTCP"
+            android:checked="false"
+            android:onClick="onRadioButtonClicked" />
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Server Address"
+        android:id="@+id/textView" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addressText" />
+
+    <ToggleButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Iniciar"
+        android:id="@+id/toggleCapture" />
+
 </LinearLayout>
 
