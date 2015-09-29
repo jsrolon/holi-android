@@ -37,6 +37,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -119,11 +120,31 @@ public class HoliLocator extends Activity implements
     private void startLocationUpdates() {
         ((EditText)findViewById(R.id.addressText)).setEnabled(false);
         mNetAddress = ((EditText)findViewById(R.id.addressText)).getText().toString();
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        for(int i = 0; i < 300; i++) {
+            final int nThread = i;
+            new Thread() {
+                @Override
+                public void run() {
+                    while(true) {
+                        if(mIsUDPSelected) {
+                            new SendUDPTask().execute(nThread);
+                        } else {
+                            new SendTCPTask().execute(nThread);
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
+        }
     }
 
     private void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+//        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         ((EditText)findViewById(R.id.addressText)).setEnabled(true);
     }
 
@@ -276,11 +297,11 @@ public class HoliLocator extends Activity implements
     @Override
     public void onLocationChanged(Location location) {
         // send the info
-        if(mIsUDPSelected) {
-            new SendUDPTask().execute(location);
-        } else {
-            new SendTCPTask().execute(location);
-        }
+//        if(mIsUDPSelected) {
+//            new SendUDPTask().execute(location);
+//        } else {
+//            new SendTCPTask().execute(location);
+//        }
         // update UI
         textAltitudeText.setText("Altitude: " + location.getAltitude());
         textLatitudeText.setText("Latitude: " + location.getLatitude());
@@ -288,34 +309,16 @@ public class HoliLocator extends Activity implements
         textSpeedText.setText("Speed: " + location.getSpeed());
     }
 
-    private class SocketConfig extends AsyncTask<Boolean, Void, Void> {
-
-        /**
-         * Send info through TCP
-         * @param booleans
-         * @return
-         */
-        @Override
-        protected Void doInBackground(Boolean... booleans) {
-            double start = System.currentTimeMillis();
-
-            Log.i(TAG, "Elapsed: " + (System.currentTimeMillis() - start) + "us");
-            return null;
-        }
-    }
-
-    private class SendUDPTask extends AsyncTask<Location, Void, Void> {
+    private class SendUDPTask extends AsyncTask<Integer, Void, Void> {
 
         /**
          * Sends info through UDP
-         * @param locations a singular location, as the calling method only uses one
+         * @param ints a singular location, as the calling method only uses one
          * @return null
          */
         @Override
-        protected Void doInBackground(Location... locations) {
-            double start = System.nanoTime();
-            Location loc = locations[0];
-            String udpMsg = loc.getAltitude() + ";" + loc.getLatitude() + ";" + loc.getLongitude() + ";" + loc.getSpeed();
+        protected Void doInBackground(Integer... ints) {
+            String udpMsg = "thread" + ints[0];
             DatagramSocket ds = null;
             try {
                 ds = new DatagramSocket();
@@ -323,7 +326,6 @@ public class HoliLocator extends Activity implements
                 DatagramPacket dp;
                 dp = new DatagramPacket(udpMsg.getBytes(), udpMsg.length(), serverAddr, 1337);
                 ds.send(dp);
-                Log.w(TAG, "UDP Sent Location");
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (UnknownHostException e) {
@@ -337,38 +339,32 @@ public class HoliLocator extends Activity implements
                     ds.close();
                 }
             }
-            Log.i(TAG, "Elapsed: " + (System.nanoTime() - start) * 1000 + "us");
             return null;
         }
     }
 
-    private class SendTCPTask extends AsyncTask<Location, Void, Void> {
+    private class SendTCPTask extends AsyncTask<Integer, Void, Void> {
 
         /**
          * Send info through TCP
-         * @param locations
+         * @param ints
          * @return
          */
         @Override
-        protected Void doInBackground(Location... locations) {
-            double start = System.currentTimeMillis();
-            Location loc = locations[0];
+        protected Void doInBackground(Integer... ints) {
             try {
                 Socket s = new Socket(mNetAddress, 1337);
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-                String outMsg = loc.getAltitude() + ";" + loc.getLatitude() + ";" + loc.getLongitude() + ";" + loc.getSpeed();
+                String outMsg = "thread" + ints[0];
                 double startInner = System.currentTimeMillis();
                 out.write(outMsg);
                 out.flush();
-                Log.i(TAG, "Elapsed Inner: " + (System.currentTimeMillis() - startInner) + "us");
                 s.close();
-                Log.w(TAG, "TCP Sent Location");
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.i(TAG, "Elapsed: " + (System.currentTimeMillis() - start) + "us");
             return null;
         }
     }
